@@ -159,7 +159,8 @@ class Icon(Clutter.Actor):
         self.drag_action = Clutter.DragAction()
 
         # Setup widgets
-        self.icon_image.set_data(pixbuf.get_pixels(),
+        if pixbuf != None:
+            self.icon_image.set_data(pixbuf.get_pixels(),
                                  Cogl.PixelFormat.RGBA_8888 if pixbuf.get_has_alpha() else Cogl.PixelFormat.RGB_888,
                                  icon_size, icon_size, pixbuf.get_rowstride())
         self.title_text.set_markup(f"<span color='white' font='Lato Bold 11'>{self.title_name}</span>")
