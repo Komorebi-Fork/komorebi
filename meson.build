@@ -47,12 +47,8 @@ dependencies = [
     dependency('clutter-gtk-1.0'),
     dependency('clutter-1.0'),
     dependency('clutter-gst-3.0'),
+    dependency('webkit2gtk-4.1', required: false),
 ]
-
-webkit_dep = dependency('webkit2gtk-4.1', required: false)
-if not webkit_dep.found()
-    webkit_dep = dependency('webkit2gtk-6.0')
-endif
 
 install_data(
     ['komorebi.py', 'komorebi-wallpaper-creator.py'],
