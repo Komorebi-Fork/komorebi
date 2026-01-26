@@ -47,7 +47,7 @@ dependencies = [
     dependency('clutter-gtk-1.0'),
     dependency('clutter-1.0'),
     dependency('clutter-gst-3.0'),
-    dependency('webkit2gtk-4.1', required: false),
+    dependency('webkit2gtk-4.1', version: '>=2.40', required: true),
 ]
 
 install_data(
