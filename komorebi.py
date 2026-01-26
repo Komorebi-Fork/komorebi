@@ -19,13 +19,13 @@ gi.require_versions({
 })
 
 try:
-    gi.require_version('WebKit2', '4.0')
+    gi.require_version('WebKit2', '4.1')
 except ValueError:
-    # If 4.0 is not available, try 4.1
+    # If 4.1 is not available, try 6.0
     try:
-        gi.require_version('WebKit2', '4.1')
+        gi.require_version('WebKit2', '6.0')
     except ValueError:
-        print("Neither WebKit2 version 4.0 nor 4.1 is available.")
+        print("Neither WebKit2 version 4.1 nor 6.0 is available.")
         sys.exit(1)
 
 from komorebi.screen import Screen
