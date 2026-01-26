@@ -38,7 +38,7 @@ Please test on your own distro and submit a pull request with your distro's inst
 If you'd like to compile Komorebi from source instead, you'll need to install the following dependencies:
 
 ```bash
-sudo apt install meson valac libgtk-3-dev libgee-0.8-dev libclutter-gtk-1.0-dev libclutter-1.0-dev libwebkit2gtk-4.0-dev libclutter-gst-3.0-dev
+sudo apt install meson valac libgtk-3-dev libgee-0.8-dev libclutter-gtk-1.0-dev libclutter-1.0-dev libwebkitgtk-4.1-dev libclutter-gst-3.0-dev
 ```
 
 and jump to the [compiling section](#compiling).
@@ -54,7 +54,7 @@ sudo rpm -ivh komorebi-2.2.0-9.1.x86_64.rpm
 If you'd like to compile Komorebi from source instead, you'll need to install the following dependencies:
 
 ```bash
-sudo dnf install meson vala gcc-c++ gtk3-devel clutter-devel clutter-gtk-devel clutter-gst3-devel webkit2gtk3-devel libgee-devel gstreamer1-libav
+sudo dnf install meson vala gcc-c++ gtk3-devel clutter-devel clutter-gtk-devel clutter-gst3-devel webkitgtk3-devel libgee-devel gstreamer1-libav
 ```
 
 and jump to the [compiling section](#compiling).
