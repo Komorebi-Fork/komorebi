@@ -2,5 +2,13 @@
 	"python.linting.flake8Enabled": true,
 	"python.linting.enabled": true,
 	"C_Cpp.default.configurationProvider": "mesonbuild.mesonbuild",
-	"C_Cpp.default.compileCommands": "/data/development/temp/komorebi/builddir/compile_commands.json"
+	"C_Cpp.default.compileCommands": "/data/development/temp/komorebi/builddir/compile_commands.json",
+	// 确保解释器和终端一致
+  "python.defaultInterpreterPath": "/run/current-system/sw/bin/python3",
+  // 加载项目根目录的 .env 文件
+  "python.envFile": "${workspaceFolder}/.env",
+  // 让 VS Code 内置终端继承 PYTHONPATH
+  "terminal.integrated.env.linux": {
+    "PYTHONPATH": "/nix/store/xxxx-pygobject3-3.48.2/lib/python3.13/site-packages"
+  }
 }
