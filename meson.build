@@ -49,9 +49,9 @@ dependencies = [
     dependency('clutter-gst-3.0'),
 ]
 
-webkit_dep = dependency('webkit2gtk-4.1', required: false)
+webkit_dep = dependency('webkitgtk-4.1', required: false)
 if not webkit_dep.found()
-    webkit_dep = dependency('webkit2gtk-4.0')
+    webkit_dep = dependency('webkitgtk-6.0')
 endif
 
 install_data(
