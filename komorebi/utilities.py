@@ -59,7 +59,7 @@ def get_wallpaper_config_file(name):
     # If not, fallback to the default type
     if not wallpaper_found:
         name = 'foggy_sunny_mountain'
-        wallpaper_path = f'{komorebi.__package_datadir__}/{name}'
+        wallpaper_path = f'{komorebi.__package_datadir__}/Wallpapers/{name}'
         wallpaper_config_path = f'{wallpaper_path}/config'
 
         logging.error(f'got an invalid wallpaper. Setting to default: {name}')

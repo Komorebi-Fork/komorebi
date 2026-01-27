@@ -3,3 +3,4 @@ builddir
 __pycache__
 .vscode
 .idea
+shell.nix

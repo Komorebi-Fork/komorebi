@@ -87,7 +87,7 @@ class Settings:
         Gio.Settings.new('org.gnome.desktop.background').set_boolean('show-desktop-icons', False)
 
         # Check if we have nemo installed
-        settingsSchemaSource = Gio.SettingsSchemaSource.new_from_directory('/usr/share/glib-2.0/schemas', None, False)
+        settingsSchemaSource = Gio.SettingsSchemaSource.get_default()
         settingsSchema = settingsSchemaSource.lookup('org.nemo.desktop', False)
 
         if settingsSchema is not None:
