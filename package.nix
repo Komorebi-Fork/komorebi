@@ -21,11 +21,17 @@ stdenv.mkDerivation (finalAttrs: {
   pname = "komorebi";
   version = "3.0.0";
 
-  src = fetchFromGitHub {
-    owner = "luozenan";
-    repo = "nixos-komorebi";
-    rev = "bbc6b99b625d48b53fdda4397477677473d541bc";
-    hash = "sha256-fpvvWfJqld313x1IcZKd+4RZxVplcvw3lIfhNPXpX5g=";
+  src = lib.fileset.toSource {
+    root = ./.;
+    fileset = lib.fileset.unions [
+      ./data
+      ./komorebi
+      ./screenshots
+      ./komorebi.py
+      ./komorebi-wallpaper-creator.py
+      ./komorebi.spec
+      ./meson.build
+    ];
   };
 
   nativeBuildInputs = [
