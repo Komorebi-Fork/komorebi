@@ -24,8 +24,8 @@ stdenv.mkDerivation (finalAttrs: {
   src = fetchFromGitHub {
     owner = "luozenan";
     repo = "nixos-komorebi";
-    rev = "dbbc704ea6ca75d2cd05407652ce051bd2e47818";
-    hash = "sha256-qiVfieW9j8uDe9ExKCcOAf7IZUufCl0NcZ1mB+iCXbo=";
+    rev = "bbc6b99b625d48b53fdda4397477677473d541bc";
+    hash = "sha256-fpvvWfJqld313x1IcZKd+4RZxVplcvw3lIfhNPXpX5g=";
   };
 
   nativeBuildInputs = [
