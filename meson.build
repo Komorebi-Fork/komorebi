@@ -47,12 +47,8 @@ dependencies = [
     dependency('clutter-gtk-1.0'),
     dependency('clutter-1.0'),
     dependency('clutter-gst-3.0'),
+    dependency('webkit2gtk-4.1', version: '>=2.40', required: true),
 ]
-
-webkit_dep = dependency('webkitgtk-4.1', required: false)
-if not webkit_dep.found()
-    webkit_dep = dependency('webkitgtk-4.0')
-endif
 
 install_data(
     ['komorebi.py', 'komorebi-wallpaper-creator.py'],
@@ -62,3 +58,12 @@ install_data(
 
 subdir('data')
 subdir('komorebi')
+
+# 原有配置不变，在最后添加以下内容
+# 安装komorebi模块到Python的site-packages目录
+py_install_dir = py.get_install_dir()  # 获取Python的site-packages路径
+install_subdir(
+    'komorebi',  # 模块目录名（对应subdir('komorebi')）
+    install_dir: join_paths(py_install_dir, 'komorebi'),  # 安装到site-packages/komorebi
+    strip_directory: false,  # 保留目录结构
+)

@@ -4,7 +4,7 @@ Release: 1%{?dist}
 Summary: A beautiful and customizable wallpaper manager for Linux
 License: GPL-3.0
 
-URL: https://github.com/Komorebi-Fork/komorebi
+URL: https://github.com/luozenan/nixos-komorebi
 Source0: %{name}-%{version}.tar.xz
 
 BuildRequires: meson
