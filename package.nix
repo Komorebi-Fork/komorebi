@@ -48,11 +48,14 @@ stdenv.mkDerivation (finalAttrs: {
     ]))
   ];
 
+  postFixup = ''
+    wrapProgram $out/bin/komorebi \
+      --prefix PYTHONPATH : $out/lib/python3.13/site-packages
+  '';
+
   passthru.tests.version = testers.testVersion { package = finalAttrs.finalPackage; };
 
   meta = {
-    # webkitgtk_4_0 was removed
-    broken = true;
     description = "Beautiful and customizable wallpaper manager for Linux";
     homepage = "https://github.com/Komorebi-Fork/komorebi";
     license = lib.licenses.gpl3Only;
