@@ -51,6 +51,8 @@ stdenv.mkDerivation (finalAttrs: {
   postFixup = ''
     wrapProgram $out/bin/komorebi \
       --prefix PYTHONPATH : $out/lib/python3.13/site-packages
+    wrapProgram $out/bin/komorebi-wallpaper-creator \
+      --prefix PYTHONPATH : $out/lib/python3.13/site-packages
   '';
 
   passthru.tests.version = testers.testVersion { package = finalAttrs.finalPackage; };
