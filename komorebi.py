@@ -7,7 +7,7 @@ import signal
 import sys
 import logging
 
-gi.require_versions({
+required_namespaces = {
     'Gtk': '3.0',
     'GObject': '2.0',
     'GtkClutter': '1.0',
@@ -16,16 +16,38 @@ gi.require_versions({
     'Gdk': '3.0',
     'GdkPixbuf': '2.0',
     'Gst': '1.0',
-})
+}
+
+missing = []
+for ns, ver in required_namespaces.items():
+    try:
+        gi.require_version(ns, ver)
+    except ValueError:
+        missing.append(f"{ns} {ver}")
+
+if missing:
+    print("The following GObject Introspection namespaces are not available:")
+    for m in missing:
+        print(f"  - {m}")
+    print("")
+    print("Possible fixes:")
+    print("  - Install the system packages that provide the GObject introspection bindings (example for Debian/Ubuntu):")
+    print("      sudo apt install gir1.2-gtk-3.0 gir1.2-gdkpixbuf-2.0 gir1.2-gst-1.0 gir1.2-clutter-1.0 gir1.2-gtkclutter-1.0")
+    print("  - On NixOS, add the corresponding packages to your environment.systemPackages in /etc/nixos/configuration.nix:")
+    print("      environment.systemPackages = with pkgs; [ gtk3 gobject-introspection gdk-pixbuf clutter clutter-gtk clutter-gst webkitgtk_6_0 gst-plugins-base gst-plugins-good ];")
+    print("    Then run 'sudo nixos-rebuild switch' to apply changes.")
+    print("")
+    print("If you believe these namespaces are installed, check your PYGI_OVERWRITE_... environment or the GI typelib path.")
+    sys.exit(1)
 
 try:
-    gi.require_version('WebKit2', '4.0')
+    gi.require_version('WebKit2', '4.1')
 except ValueError:
-    # If 4.0 is not available, try 4.1
+    # If 4.1 is not available, try 6.0
     try:
-        gi.require_version('WebKit2', '4.1')
+        gi.require_version('WebKit2', '6.0')
     except ValueError:
-        print("Neither WebKit2 version 4.0 nor 4.1 is available.")
+        print("Neither WebKit2 version 4.1 nor 6.0 is available.")
         sys.exit(1)
 
 from komorebi.screen import Screen

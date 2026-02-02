@@ -2,3 +2,8 @@ build
 builddir
 __pycache__
 .vscode
+.idea
+shell.nix
+result
+.env
+.editorconfig
