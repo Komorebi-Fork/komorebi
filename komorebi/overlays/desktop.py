@@ -104,11 +104,14 @@ class ResponsiveGrid(Overlay):
     items_limit = 8
 
     # Layouts (HORIZONTAL/VERTICAL)
-    horizontal_layout = Clutter.BoxLayout(orientation=Clutter.Orientation.HORIZONTAL, spacing=50)
-    vertical_layout = Clutter.BoxLayout(orientation=Clutter.Orientation.VERTICAL, spacing=30)
+    horizontal_layout = None
+    vertical_spacing = 30
 
     def __init__(self, screen):
         Overlay.__init__(self)
+
+        # Per-instance layout: a Clutter layout manager must only drive one container
+        self.horizontal_layout = Clutter.BoxLayout(orientation=Clutter.Orientation.HORIZONTAL, spacing=50)
 
         self.set_size(screen.width, screen.height)
 
@@ -123,7 +126,8 @@ class ResponsiveGrid(Overlay):
                 return
 
         # Create a new column and add the new item to it
-        column_actor = Clutter.Actor(layout_manager=self.vertical_layout, y_align=Clutter.ActorAlign.START, y_expand=True)
+        column_layout = Clutter.BoxLayout(orientation=Clutter.Orientation.VERTICAL, spacing=self.vertical_spacing)
+        column_actor = Clutter.Actor(layout_manager=column_layout, y_align=Clutter.ActorAlign.START, y_expand=True)
 
         column_actor.add_child(item)
         self.add_child(column_actor)
@@ -138,7 +142,7 @@ class Icon(Clutter.Actor):
     # Title of the file
     title_name = ''
 
-    box_layout = Clutter.BoxLayout(orientation=Clutter.Orientation.VERTICAL)
+    box_layout = None
 
     icon_actor = None
     icon_image = None
@@ -164,6 +168,7 @@ class Icon(Clutter.Actor):
                                  icon_size, icon_size, pixbuf.get_rowstride())
         self.title_text.set_markup(f"<span color='white' font='Lato Bold 11'>{self.title_name}</span>")
 
+        self.box_layout = Clutter.BoxLayout(orientation=Clutter.Orientation.VERTICAL)
         self.set_layout_manager(self.box_layout)
         self.set_reactive(True)
         self.set_height(83)
@@ -526,16 +531,25 @@ class Desktop(ResponsiveGrid):
 
     def _on_copy_path(self, item, e):
         icon = self.selected_icon
-        komorebi.utilities.clipboard.set_text(icon.path, len(icon.path))
-        komorebi.utilities.clipboard.store()
+        # No clipboard.store(): it blocks waiting for the clipboard manager
+        komorebi.utilities.clipboard.set_text(icon.path, -1)
         return False
 
     def _on_paste(self, item, e):
-        # Get the actual GLib file
-        path = komorebi.utilities.clipboard.wait_for_text()
-        file = Gio.File.new_for_path(path)
-        desktop_file = Gio.File.new_for_path(self.desktop_path + '/' + file.get_basename())
-        file.copy(desktop_file, Gio.FileCopyFlags.NONE, None)
+        # Request the clipboard asynchronously: wait_for_text() blocks inside Clutter's
+        # event handler and can freeze komorebi entirely.
+        def _on_text_received(_clipboard, path):
+            if not path:
+                return
+            # Get the actual GLib file
+            file = Gio.File.new_for_path(path)
+            desktop_file = Gio.File.new_for_path(self.desktop_path + '/' + file.get_basename())
+            try:
+                file.copy(desktop_file, Gio.FileCopyFlags.NONE, None)
+            except GLib.Error as err:
+                logging.warning(f'Error pasting {path}: {err}')
+
+        komorebi.utilities.clipboard.request_text(_on_text_received)
         return False
 
     def _on_move_to_trash(self, item, e):
@@ -601,11 +615,17 @@ class Desktop(ResponsiveGrid):
                 self.copy_path_item.set_view_mode(ViewMode.INVISIBLE)
                 self.get_info_item.set_view_mode(ViewMode.INVISIBLE)
                 self.new_folder_item.set_view_mode(ViewMode.VISIBLE)
-                # FIXME: This line hangs if user "spams" the menu with right-click; investigate further
-                if komorebi.utilities.clipboard.wait_for_text() is not None:
-                    self.paste_item.set_view_mode(ViewMode.VISIBLE)
-                else:
-                    self.paste_item.set_view_mode(ViewMode.GREYED)
+                # Grey out Paste until we know the clipboard has text. This must be asynchronous:
+                # wait_for_text() blocks inside Clutter's event handler and froze komorebi.
+                self.paste_item.set_view_mode(ViewMode.GREYED)
+
+                def _on_text_received(_clipboard, text):
+                    self.paste_item.set_view_mode(ViewMode.VISIBLE if text is not None else ViewMode.GREYED)
+                    # Only refresh reactivity if the menu is still showing the item
+                    if self.paste_item.is_visible():
+                        self.paste_item.show_item()
+
+                komorebi.utilities.clipboard.request_text(_on_text_received)
 
             return False
 
@@ -641,7 +661,7 @@ class Desktop(ResponsiveGrid):
     # Adds all icons from the queue
     def add_icons_from_queue(self):
         import math
-        self.items_limit = math.floor(self.screen_height / (83 + self.vertical_layout.get_spacing()))
+        self.items_limit = math.floor(self.screen_height / (83 + self.vertical_spacing))
         self.clear_icons()
         self.destroy_all_children()
 
