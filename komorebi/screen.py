@@ -38,23 +38,11 @@ class Screen(Gtk.Window):
         Gtk.Window.__init__(self, title=f'Komorebi - Screen {monitor_index}')
         self.signal_handlers = []
 
-        # Get monitor info
-        display = Gdk.Display.get_default()
-        rectangle = display.get_monitor(monitor_index).get_geometry()
-
-        self.width = rectangle.width
-        self.height = rectangle.height
-        self.index = monitor_index
-        if self.width == 0 or self.height == 0:
-            raise RuntimeError(f"Couldn't get monitor geometry for monitor {monitor_index}")
-        logging.debug(f'{monitor_index} - Rectangle geometry: x={rectangle.x} y={rectangle.y} '
-                      f'w={rectangle.width} h={rectangle.height}')
         self.set_gravity(Gdk.Gravity.STATIC)
-        self.move(rectangle.x, rectangle.y)
+        self.set_monitor(monitor_index)
 
         # Set window properties
         logging.debug(f'{monitor_index} - Setting window properties...')
-        self.set_size_request(self.width, self.height)
         self.set_resizable(False)
         self.set_type_hint(Gdk.WindowTypeHint.DESKTOP)
         self.set_keep_below(True)
@@ -95,6 +83,34 @@ class Screen(Gtk.Window):
         self.stage.add_child(self.bubble_menu)
 
         self.add(self.embed)
+
+    def set_monitor(self, monitor_index):
+        '''
+        Fits this window to the given monitor. Call load_wallpaper() afterwards so the
+        wallpaper and overlays are rebuilt for the new size.
+        '''
+        display = Gdk.Display.get_default()
+        rectangle = display.get_monitor(monitor_index).get_geometry()
+        if rectangle.width == 0 or rectangle.height == 0:
+            raise RuntimeError(f"Couldn't get monitor geometry for monitor {monitor_index}")
+        logging.debug(f'{monitor_index} - Rectangle geometry: x={rectangle.x} y={rectangle.y} '
+                      f'w={rectangle.width} h={rectangle.height}')
+
+        self.index = monitor_index
+        self.width = rectangle.width
+        self.height = rectangle.height
+        self.set_title(f'Komorebi - Screen {monitor_index}')
+
+        self.move(rectangle.x, rectangle.y)
+        self.set_size_request(self.width, self.height)
+        self.resize(self.width, self.height)
+
+        # These don't exist yet when called from __init__
+        if self.stage is not None:
+            self.stage.set_size(self.width, self.height)
+        if self.bubble_menu is not None:
+            self.bubble_menu.screen_width = self.width
+            self.bubble_menu.screen_height = self.height
 
     def signals_setup(self):
         def _on_button_press_event(_, e, self):
@@ -145,7 +161,7 @@ class Screen(Gtk.Window):
         self.emit('settings_requested', False)
         return False
 
-    def load_wallpaper(self, name):
+    def unload(self):
         # Warn all elements of unloading
         for wallpaper in self.wallpaper_root.get_children():
             wallpaper.on_unload()
@@ -157,6 +173,9 @@ class Screen(Gtk.Window):
         for signal in self.signal_handlers:
             self.disconnect(signal)
         self.signal_handlers = []
+
+    def load_wallpaper(self, name):
+        self.unload()
 
         wallpaper_info = komorebi.utilities.get_wallpaper_config_file(name)
         wallpaper = komorebi.utilities.load_wallpaper(self, wallpaper_info)
