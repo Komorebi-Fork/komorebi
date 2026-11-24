@@ -89,6 +89,19 @@ def main():
         logging.info('Wayland detected. Wayland support is Experimental!')
         logging.info('Contribute to Komorebi and add the support! <3')
 
+    # Work around Clutter bugs with more than one screen (one stage per monitor) on Mesa.
+    # Must be set before Clutter is initialized.
+    # - disable-clipped-redraws: clipped redraws make Cogl query GLX drawable attributes,
+    #   which fails for our stage windows -> GLXBadDrawable crash (issues #18, #105).
+    # - disable-culling: paint culling intermittently skips overlay actors (e.g. the desktop
+    #   icons), making them flicker.
+    if not args.single_screen:
+        paint_flags = [f for f in os.environ.get('CLUTTER_PAINT', '').split(',') if f]
+        for flag in ('disable-clipped-redraws', 'disable-culling'):
+            if flag not in paint_flags:
+                paint_flags.append(flag)
+        os.environ['CLUTTER_PAINT'] = ','.join(paint_flags)
+
     # Initialize backends
     GtkClutter.init(sys.argv)
     logging.debug("GtkClutter initialized")
