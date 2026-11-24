@@ -9,11 +9,10 @@ class BubbleMenu(Clutter.Actor):
     screen_height = None
 
     # Signal handlers
-    signal_handlers = []
+    signal_handlers = None
 
     # Layout
-    options_layout = Clutter.BoxLayout(orientation=Clutter.Orientation.VERTICAL, spacing=5)
-    hierarchy_layout = Clutter.BoxLayout(orientation=Clutter.Orientation.VERTICAL)
+    hierarchy_layout = None
 
     # Hierarchies
     overlay_options = None
@@ -23,6 +22,10 @@ class BubbleMenu(Clutter.Actor):
     def __init__(self, screen):
         Clutter.Actor.__init__(self)
         logging.debug('Loading BubbleMenu...')
+
+        # Per-instance state (class-level lists/layouts would be shared between screens)
+        self.signal_handlers = []
+        self.hierarchy_layout = Clutter.BoxLayout(orientation=Clutter.Orientation.VERTICAL)
 
         # Get screen dimensions
         self.screen_width = screen.width
@@ -41,7 +44,7 @@ class BubbleMenu(Clutter.Actor):
         self.wallpaper_options = Clutter.Actor()
         self.meta_options = Clutter.Actor()
         for hierarchy in [self.overlay_options, self.wallpaper_options, self.meta_options]:
-            hierarchy.set_layout_manager(self.options_layout)
+            hierarchy.set_layout_manager(Clutter.BoxLayout(orientation=Clutter.Orientation.VERTICAL, spacing=5))
             hierarchy.set_x_align(Clutter.ActorAlign.START)
             hierarchy.set_x_expand(True)
             self.add_child(hierarchy)

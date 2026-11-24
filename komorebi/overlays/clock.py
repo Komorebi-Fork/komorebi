@@ -42,7 +42,7 @@ class Clock(Overlay):
     date_shadow_text = None
 
     # Vertical Box Layout
-    box_layout = Clutter.BoxLayout(orientation=Clutter.Orientation.VERTICAL)
+    box_layout = None
 
     # Time updater
     timeout_handle = None
@@ -76,8 +76,9 @@ class Clock(Overlay):
         self.drag_action = Clutter.DragAction()
 
         # Properties
-        self.text_container_actor.set_layout_manager(self.box_layout)
-        self.shadow_container_actor.set_layout_manager(self.box_layout)
+        # Each container needs its own layout manager (they can't be shared)
+        self.text_container_actor.set_layout_manager(Clutter.BoxLayout(orientation=Clutter.Orientation.VERTICAL))
+        self.shadow_container_actor.set_layout_manager(Clutter.BoxLayout(orientation=Clutter.Orientation.VERTICAL))
 
         self.set_background_color(Clutter.Color(0, 0, 0, 0))
         self.set_opacity(0)

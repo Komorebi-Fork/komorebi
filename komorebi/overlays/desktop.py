@@ -104,11 +104,14 @@ class ResponsiveGrid(Overlay):
     items_limit = 8
 
     # Layouts (HORIZONTAL/VERTICAL)
-    horizontal_layout = Clutter.BoxLayout(orientation=Clutter.Orientation.HORIZONTAL, spacing=50)
-    vertical_layout = Clutter.BoxLayout(orientation=Clutter.Orientation.VERTICAL, spacing=30)
+    horizontal_layout = None
+    vertical_spacing = 30
 
     def __init__(self, screen):
         Overlay.__init__(self)
+
+        # Per-instance layout: a Clutter layout manager must only drive one container
+        self.horizontal_layout = Clutter.BoxLayout(orientation=Clutter.Orientation.HORIZONTAL, spacing=50)
 
         self.set_size(screen.width, screen.height)
 
@@ -123,7 +126,8 @@ class ResponsiveGrid(Overlay):
                 return
 
         # Create a new column and add the new item to it
-        column_actor = Clutter.Actor(layout_manager=self.vertical_layout, y_align=Clutter.ActorAlign.START, y_expand=True)
+        column_layout = Clutter.BoxLayout(orientation=Clutter.Orientation.VERTICAL, spacing=self.vertical_spacing)
+        column_actor = Clutter.Actor(layout_manager=column_layout, y_align=Clutter.ActorAlign.START, y_expand=True)
 
         column_actor.add_child(item)
         self.add_child(column_actor)
@@ -138,7 +142,7 @@ class Icon(Clutter.Actor):
     # Title of the file
     title_name = ''
 
-    box_layout = Clutter.BoxLayout(orientation=Clutter.Orientation.VERTICAL)
+    box_layout = None
 
     icon_actor = None
     icon_image = None
@@ -164,6 +168,7 @@ class Icon(Clutter.Actor):
                                  icon_size, icon_size, pixbuf.get_rowstride())
         self.title_text.set_markup(f"<span color='white' font='Lato Bold 11'>{self.title_name}</span>")
 
+        self.box_layout = Clutter.BoxLayout(orientation=Clutter.Orientation.VERTICAL)
         self.set_layout_manager(self.box_layout)
         self.set_reactive(True)
         self.set_height(83)
@@ -641,7 +646,7 @@ class Desktop(ResponsiveGrid):
     # Adds all icons from the queue
     def add_icons_from_queue(self):
         import math
-        self.items_limit = math.floor(self.screen_height / (83 + self.vertical_layout.get_spacing()))
+        self.items_limit = math.floor(self.screen_height / (83 + self.vertical_spacing))
         self.clear_icons()
         self.destroy_all_children()
 

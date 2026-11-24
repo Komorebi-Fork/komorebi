@@ -14,7 +14,7 @@ class Screen(Gtk.Window):
     index = -1
 
     # Signal information
-    signal_handlers = []
+    signal_handlers = None
 
     # Bubble Menu
     dimmed = False
@@ -36,6 +36,7 @@ class Screen(Gtk.Window):
     def __init__(self, monitor_index):
         logging.debug(f'Initializing background window for monitor {monitor_index}...')
         Gtk.Window.__init__(self, title=f'Komorebi - Screen {monitor_index}')
+        self.signal_handlers = []
 
         # Get monitor info
         display = Gdk.Display.get_default()
